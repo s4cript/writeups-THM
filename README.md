@@ -6,7 +6,7 @@ Welcome to my repository containing writeups for TryHackMe labs!
 
 ### Room 1 -Dreaming
 
-- [Dreaming-writeup.md](Dreaming-writeup.md): Description of the room and solution.
+- [Dreaming-writeup.md](Dreaming-writeup.md): Solve the riddle that dreams have woven.
 
 
 <!-- Add more rooms as needed -->
