@@ -97,7 +97,7 @@ This is command to change name for the php-reverse-shell.php to shell.phar
  s4cript> mv php-reverse-shell.php rev_shell.phar
 ```
 
-Now we upload that file, after that we get this page :
+Now we upload that file, after that we get this page :  
 ![uploaded_file](https://ibb.co/1nY7ZKC)
 
 We start a listener, then we click on that lens icon, and the file gets called and we get a reverse shell :
@@ -523,9 +523,9 @@ uid=0(root) gid=0(root) groups=0(root)
 
 Success! We now have a root shell.
 
-#### Follow me on
+## Follow me on
 
-[My Linkedin.](https://www.linkedin.com/in/fahad-khalid-al-obaidallah/)
+[My Linkedin.](https://www.linkedin.com/in/fahad-khalid-al-obaidallah/)  
 [My Twitter.](https://twitter.com/s4cript)
 
 see you :)
