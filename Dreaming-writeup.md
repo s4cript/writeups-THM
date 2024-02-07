@@ -1,5 +1,5 @@
 # Dreaming Writeup
-======
+---
 
 | Description | Difficulty | Room link                    |
 |-------------|------------|------------------------------|
@@ -8,7 +8,7 @@
 
 
 ### - Recon:
-... We will stat with an nmap scna:
+We will stat with an nmap scna:
 
 ```bash
  s4cript> nmap -sV -O -p- $VMip
