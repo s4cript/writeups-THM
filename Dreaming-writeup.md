@@ -98,7 +98,7 @@ This is command to change name for the php-reverse-shell.php to shell.phar
 ```
 
 ...Now we upload that file, after that we get this page :
-...![uploaded_file](https://ibb.co/1nY7ZKC/uploaded.png)
+...![uploaded_file](https://ibb.co/1nY7ZKC)
 
 ...We start a listener, then we click on that lens icon, and the file gets called and we get a reverse shell :
 
