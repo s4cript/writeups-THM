@@ -58,7 +58,7 @@ GENERATED WORDS: 4612
 
 ```
 
-...We got a hit with /app, let' see what's there :
+...We got a hit with /app, let' see what's there :  
 ![/app_directory](https://i.ibb.co/ZW687zG/app.png)
 
 ...We discover a hidden directory that contains a website CMS called Pluck.
