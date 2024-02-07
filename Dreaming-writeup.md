@@ -58,21 +58,30 @@ GENERATED WORDS: 4612
 ```
 We got a hit with /app, let' see what's there :
 ![/app_directory](https://i.ibb.co/ZW687zG/app.png)
+
 We discover a hidden directory that contains a website CMS called Pluck.
 Interesting, let's click on that:
 ![dreaming_page](https://i.ibb.co/ngtgv1g/dreaming.png)
+
 So from what we clicked we know that this site runs pluck 4.7.13 which is a content management system (CMS), we see in the bottom admin, and when clicking that we get a login page :
 ![login_page](https://i.ibb.co/RchYjrR/login.png)
+
 Nice , we only need the password , but we don't have that , let's try some common passwords , after a short time, I obtained the correct password it's 'password':
 ![dashbord](https://i.ibb.co/yQbtX44/dashboard.png)
+
 And we're in, that's the administration dashboard, now let's search if this CMS version has any vulnerabilities, and we found one, it's vulnerable to File Upload Remote Code Execution :
 ![exploit](https://i.ibb.co/j6nGDRh/vuln.png)
+
 And we see the exploit from ExploitDB :
 ![exploitdb](https://i.ibb.co/7JQHd0H/exploit.png)
+
 After checking that python exploit, we find that it's uploading a .phar file (which is one of many other php extensions) that contains a web shell, since we know the way let's do that manually.
+
 ### Exploitation:
+
 So first we go to the uploading page, which we can find in the navbar 'manage files' :
 ![navber](https://i.ibb.co/X4yDcjv/navbar.png)
+
 So we get this page:
 ![upload](https://i.ibb.co/vQHqycv/upload.png)
 Grabbing a PHP reverse shell, then simply switching its extension from .php to phar.
